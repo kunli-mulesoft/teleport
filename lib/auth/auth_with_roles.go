@@ -1506,13 +1506,8 @@ func (a *AuthWithRoles) UpsertRole(role services.Role) error {
 
 // GetRole returns role by name
 func (a *AuthWithRoles) GetRole(name string) (services.Role, error) {
-	// Current-user exception: we always allow users to read roles
-	// that they hold.  This requirement is checked first to avoid
-	// misleading denial messages in the logs.
-	if !utils.SliceContainsStr(a.user.GetRoles(), name) {
-		if err := a.action(defaults.Namespace, services.KindRole, services.VerbRead); err != nil {
-			return nil, trace.Wrap(err)
-		}
+	if err := a.action(defaults.Namespace, services.KindRole, services.VerbRead); err != nil {
+		return nil, trace.Wrap(err)
 	}
 	return a.authServer.GetRole(name)
 }

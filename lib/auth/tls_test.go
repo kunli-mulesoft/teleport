@@ -754,32 +754,6 @@ func (s *TLSSuite) TestNopUser(c *check.C) {
 	fixtures.ExpectAccessDenied(c, err)
 }
 
-// TestOwnRole tests that user can read roles assigned to them
-func (s *TLSSuite) TestReadOwnRole(c *check.C) {
-	clt, err := s.server.NewClient(TestAdmin())
-	c.Assert(err, check.IsNil)
-
-	user1, userRole, err := CreateUserAndRoleWithoutRoles(clt, "user1", []string{"user1"})
-	c.Assert(err, check.IsNil)
-
-	user2, _, err := CreateUserAndRoleWithoutRoles(clt, "user2", []string{"user2"})
-	c.Assert(err, check.IsNil)
-
-	// user should be able to read their own roles
-	userClient, err := s.server.NewClient(TestUser(user1.GetName()))
-	c.Assert(err, check.IsNil)
-
-	_, err = userClient.GetRole(userRole.GetName())
-	c.Assert(err, check.IsNil)
-
-	// user2 can't read user1 role
-	userClient2, err := s.server.NewClient(TestIdentity{I: LocalUser{Username: user2.GetName()}})
-	c.Assert(err, check.IsNil)
-
-	_, err = userClient2.GetRole(userRole.GetName())
-	fixtures.ExpectAccessDenied(c, err)
-}
-
 func (s *TLSSuite) TestAuthPreference(c *check.C) {
 	clt, err := s.server.NewClient(TestAdmin())
 	c.Assert(err, check.IsNil)
